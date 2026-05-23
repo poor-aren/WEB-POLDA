@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Web Anggaran — Ditbinmas Polda Aceh</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --blue:#1a4fa0;--blue-dark:#0f3270;--blue-light:#e8f0fb;--blue-mid:#2e6be6;
+    --white:#fff;--gray-50:#f7f8fa;--gray-100:#eef0f4;--gray-200:#dde1ea;
+    --gray-400:#8b95a8;--gray-700:#3d4659;--gray-900:#1a2035;
+    --success:#1a8a4a;--warning:#b86000;--danger:#c0392b;
+    --font:'Plus Jakarta Sans',sans-serif;
+    --radius:8px;--radius-lg:12px;--shadow:0 2px 8px rgba(0,0,0,0.08);
+  }
+  body{font-family:var(--font);background:var(--gray-50);color:var(--gray-900);font-size:14px;min-height:100vh}
+  
+  /* ===== LOGIN PAGE ===== */
+  #login-page{display:flex;min-height:100vh;align-items:center;justify-content:center;background:var(--gray-50)}
+  .login-box{background:var(--white);border:1px solid var(--gray-200);border-radius:var(--radius-lg);padding:40px;width:420px;max-width:95vw}
+  .login-logo{display:flex;align-items:center;gap:12px;margin-bottom:28px}
+  .login-logo .badge{width:44px;height:44px;background:var(--blue);border-radius:var(--radius);display:flex;align-items:center;justify-content:center}
+  .login-logo .badge svg{width:24px;height:24px;fill:white}
+  .login-logo h1{font-size:17px;font-weight:700;color:var(--blue-dark);line-height:1.2}
+  .login-logo p{font-size:11px;color:var(--gray-400);margin-top:1px}
+  .login-motto{font-size:12px;color:var(--gray-400);font-style:italic;border-left:3px solid var(--blue);padding-left:10px;margin-bottom:28px;line-height:1.5}
+  .form-group{margin-bottom:16px}
+  .form-group label{display:block;font-size:12px;font-weight:600;color:var(--gray-700);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
+  .form-group input,.form-group select{width:100%;padding:10px 12px;border:1px solid var(--gray-200);border-radius:var(--radius);font-family:var(--font);font-size:14px;color:var(--gray-900);background:var(--white);outline:none;transition:border .2s}
+  .form-group input:focus,.form-group select:focus{border-color:var(--blue-mid)}
+  .user-selector{position:relative}
+  .user-selector select{appearance:none;cursor:pointer;padding-right:36px}
+  .user-selector::after{content:'▾';position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--gray-400);pointer-events:none;font-size:12px}
+  .btn-primary{width:100%;padding:11px;background:var(--blue);color:var(--white);border:none;border-radius:var(--radius);font-family:var(--font);font-size:14px;font-weight:600;cursor:pointer;transition:background .2s;margin-top:8px}
+  .btn-primary:hover{background:var(--blue-dark)}
+  .login-hint{margin-top:14px;font-size:12px;color:var(--gray-400);text-align:center}
+  .login-err{background:#fef2f2;border:1px solid #fca5a5;border-radius:var(--radius);padding:10px 12px;color:#991b1b;font-size:13px;margin-bottom:14px;display:none}
+
+  /* ===== APP SHELL ===== */
+  #app{display:none;flex-direction:column;min-height:100vh}
+  header{background:var(--blue-dark);color:var(--white);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;border-bottom:2px solid var(--blue)}
+  .header-left{display:flex;align-items:center;gap:14px}
+  .header-logo{width:32px;height:32px;background:var(--white);border-radius:6px;display:flex;align-items:center;justify-content:center}
+  .header-logo svg{width:20px;height:20px;fill:var(--blue-dark)}
+  .header-title h2{font-size:15px;font-weight:700;letter-spacing:.2px}
+  .header-title p{font-size:11px;color:rgba(255,255,255,.6);margin-top:1px}
+  .header-right{display:flex;align-items:center;gap:14px}
+  .user-badge{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:6px;padding:5px 12px;font-size:12px;display:flex;align-items:center;gap:7px}
+  .user-dot{width:7px;height:7px;border-radius:50%;background:#4ade80}
+  .btn-logout{background:none;border:1px solid rgba(255,255,255,.25);color:rgba(255,255,255,.8);padding:5px 12px;border-radius:6px;cursor:pointer;font-size:12px;font-family:var(--font);transition:all .2s}
+  .btn-logout:hover{background:rgba(255,255,255,.1)}
+
+  /* ===== LAYOUT ===== */
+  .app-body{display:flex;flex:1}
+  nav{width:220px;background:var(--white);border-right:1px solid var(--gray-200);padding:16px 0;flex-shrink:0;position:sticky;top:56px;height:calc(100vh - 56px);overflow-y:auto}
+  nav .nav-label{font-size:10px;font-weight:700;color:var(--gray-400);letter-spacing:1px;text-transform:uppercase;padding:14px 20px 6px}
+  nav a{display:flex;align-items:center;gap:10px;padding:9px 20px;color:var(--gray-700);text-decoration:none;font-size:13px;font-weight:500;transition:all .2s;border-left:3px solid transparent}
+  nav a:hover{background:var(--gray-50);color:var(--blue)}
+  nav a.active{background:var(--blue-light);color:var(--blue);border-left-color:var(--blue)}
+  nav a .nav-icon{width:18px;text-align:center;font-size:15px}
+  main{flex:1;padding:24px;overflow-x:hidden}
+  .page{display:none}
+  .page.active{display:block}
+
+  /* ===== CARDS & COMPONENTS ===== */
+  .page-header{margin-bottom:24px}
+  .page-header h1{font-size:20px;font-weight:700;color:var(--gray-900)}
+  .page-header p{font-size:13px;color:var(--gray-400);margin-top:3px}
+  .card{background:var(--white);border:1px solid var(--gray-200);border-radius:var(--radius-lg);padding:20px;margin-bottom:18px}
+  .card-title{font-size:14px;font-weight:700;color:var(--gray-900);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+  .card-title .pill{font-size:11px;font-weight:600;padding:2px 8px;border-radius:20px;background:var(--blue-light);color:var(--blue)}
+  .stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:20px}
+  .stat-card{background:var(--white);border:1px solid var(--gray-200);border-radius:var(--radius);padding:14px 16px}
+  .stat-card .label{font-size:11px;color:var(--gray-400);font-weight:600;text-transform:uppercase;letter-spacing:.4px}
+  .stat-card .value{font-size:22px;font-weight:700;color:var(--gray-900);margin-top:4px}
+  .stat-card .sub{font-size:11px;color:var(--gray-400);margin-top:2px}
+  .stat-card.blue{background:var(--blue-light);border-color:var(--blue-mid)}
+  .stat-card.blue .value{color:var(--blue)}
+
+  /* ===== TABLE ===== */
+  .table-wrap{overflow-x:auto}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  thead th{background:var(--gray-50);color:var(--gray-700);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.4px;padding:10px 12px;border-bottom:2px solid var(--gray-200);text-align:left;white-space:nowrap}
+  tbody td{padding:10px 12px;border-bottom:1px solid var(--gray-100);vertical-align:middle}
+  tbody tr:hover td{background:var(--gray-50)}
+  tbody tr:last-child td{border-bottom:none}
+  .td-right{text-align:right}
+  .td-center{text-align:center}
+  .money{font-variant-numeric:tabular-nums;font-weight:500}
+  .badge{display:inline-block;font-size:11px;font-weight:600;padding:2px 8px;border-radius:20px}
+  .badge-blue{background:var(--blue-light);color:var(--blue)}
+  .badge-green{background:#dcfce7;color:#166534}
+  .badge-gray{background:var(--gray-100);color:var(--gray-700)}
+  .badge-orange{background:#fff7ed;color:#9a3412}
+  .badge-red{background:#fef2f2;color:#991b1b}
+  
+  /* ===== PROGRESS BAR ===== */
+  .progress-wrap{background:var(--gray-100);border-radius:20px;height:6px;overflow:hidden;min-width:80px}
+  .progress-bar{height:100%;border-radius:20px;background:var(--blue-mid);transition:width .4s}
+  .progress-bar.warn{background:var(--warning)}
+  .progress-bar.danger{background:var(--danger)}
+  .progress-bar.ok{background:var(--success)}
+
+  /* ===== BULAN INPUT ===== */
+  .month-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:10px}
+  .month-item{border:1px solid var(--gray-200);border-radius:var(--radius);padding:10px}
+  .month-item label{display:block;font-size:11px;font-weight:600;color:var(--gray-700);margin-bottom:6px;text-transform:uppercase}
+  .month-item input{width:100%;border:1px solid var(--gray-200);border-radius:6px;padding:7px 8px;font-family:var(--font);font-size:13px;font-weight:500;color:var(--blue-dark);text-align:right;outline:none}
+  .month-item input:focus{border-color:var(--blue-mid)}
+  .month-item .month-total{font-size:10px;color:var(--gray-400);margin-top:4px;text-align:right}
+  .month-item.has-val{background:var(--blue-light);border-color:var(--blue-mid)}
+
+  /* ===== ACTION BUTTONS ===== */
+  .btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:var(--radius);font-family:var(--font);font-size:12px;font-weight:600;cursor:pointer;border:1px solid transparent;transition:all .2s;text-decoration:none}
+  .btn-sm{padding:5px 10px;font-size:11px}
+  .btn-blue{background:var(--blue);color:var(--white);border-color:var(--blue)}
+  .btn-blue:hover{background:var(--blue-dark)}
+  .btn-outline{background:var(--white);color:var(--gray-700);border-color:var(--gray-200)}
+  .btn-outline:hover{border-color:var(--blue);color:var(--blue)}
+  .btn-success{background:#166534;color:var(--white)}
+  .btn-success:hover{background:#14532d}
+  .btn-danger{background:var(--danger);color:var(--white)}
+  .btn-danger:hover{background:#a93226}
+  .btn-warning{background:#b45309;color:var(--white)}
+  .btn-warning:hover{background:#92400e}
+
+  /* ===== MODAL ===== */
+  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:1000;display:none;align-items:center;justify-content:center}
+  .modal-overlay.open{display:flex}
+  .modal{background:var(--white);border-radius:var(--radius-lg);padding:28px;width:520px;max-width:95vw;max-height:90vh;overflow-y:auto}
+  .modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+  .modal-header h3{font-size:16px;font-weight:700;color:var(--gray-900)}
+  .modal-close{background:none;border:none;font-size:20px;cursor:pointer;color:var(--gray-400);line-height:1;padding:4px}
+  .modal-close:hover{color:var(--gray-900)}
+  .modal-body .form-group{margin-bottom:14px}
+  .modal-body label{display:block;font-size:12px;font-weight:600;color:var(--gray-700);margin-bottom:5px}
+  .modal-body input,.modal-body select,.modal-body textarea{width:100%;padding:9px 12px;border:1px solid var(--gray-200);border-radius:var(--radius);font-family:var(--font);font-size:13px;outline:none}
+  .modal-body input:focus,.modal-body select:focus,.modal-body textarea:focus{border-color:var(--blue-mid)}
+  .modal-body textarea{resize:vertical;min-height:80px}
+  .modal-footer{display:flex;gap:10px;justify-content:flex-end;margin-top:20px;padding-top:16px;border-top:1px solid var(--gray-100)}
+  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+  /* ===== INFO BOX ===== */
+  .info-box{padding:12px 14px;border-radius:var(--radius);font-size:12px;margin-bottom:16px;display:flex;gap:10px}
+  .info-box.blue{background:var(--blue-light);border:1px solid #c7dbf5;color:var(--blue-dark)}
+  .info-box.green{background:#dcfce7;border:1px solid #bbf7d0;color:#166534}
+  .info-box.orange{background:#fff7ed;border:1px solid #fed7aa;color:#9a3412}
+
+  /* ===== MONTH ACTIONS TABLE ===== */
+  .month-action-row{display:flex;align-items:center;gap:8px}
+  .surat-list{margin-top:10px}
+  .surat-item{background:var(--gray-50);border:1px solid var(--gray-200);border-radius:var(--radius);padding:10px 14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:flex-start}
+  .surat-item .surat-info{font-size:12px;color:var(--gray-700);line-height:1.6}
+  .surat-item .surat-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;white-space:nowrap;margin-left:8px}
+  .surat-item .surat-badge.pengajuan{background:#dbeafe;color:#1e40af}
+  .surat-item .surat-badge.lpd{background:#dcfce7;color:#166534}
+
+  /* ===== SCROLLBAR ===== */
+  ::-webkit-scrollbar{width:5px;height:5px}
+  ::-webkit-scrollbar-track{background:var(--gray-50)}
+  ::-webkit-scrollbar-thumb{background:var(--gray-200);border-radius:10px}
+
+  /* ===== URAIAN EDITOR (Admin) ===== */
+  .uraian-editor{margin-top:8px}
+  .uraian-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;padding:8px 10px;background:var(--gray-50);border-radius:var(--radius);border:1px solid var(--gray-200)}
+  .uraian-row input{flex:1;border:1px solid var(--gray-200);border-radius:6px;padding:6px 10px;font-family:var(--font);font-size:13px;background:var(--white)}
+  .uraian-row .dana-input{width:150px;text-align:right}
+  .uraian-row button{padding:5px 8px;border:none;border-radius:5px;cursor:pointer;font-size:12px}
+
+  /* ===== REKAP TRIWULAN ===== */
+  .triwulan-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:12px}
+  .twl-card{border:1px solid var(--gray-200);border-radius:var(--radius);padding:12px;text-align:center}
+  .twl-card .twl-label{font-size:11px;color:var(--gray-400);font-weight:600;text-transform:uppercase}
+  .twl-card .twl-val{font-size:16px;font-weight:700;color:var(--blue);margin:6px 0 4px}
+  .twl-card .twl-pct{font-size:12px;color:var(--gray-400)}
+  .twl-card .twl-target{font-size:10px;color:var(--gray-400);margin-top:2px}
+
+  /* mobile friendly */
+  @media(max-width:768px){
+    nav{display:none}
+    main{padding:14px}
+    .month-grid{grid-template-columns:repeat(2,1fr)}
+    .triwulan-grid{grid-template-columns:repeat(2,1fr)}
+    .form-row{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== LOGIN PAGE ===== -->
+<div id="login-page">
+  <div class="login-box">
+    <div class="login-logo">
+      <div class="badge">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2L3 7v10l9 5 9-5V7L12 2zm0 2.18L19 8v8l-7 3.82L5 16V8l7-3.82zM12 6a4 4 0 100 8 4 4 0 000-8zm0 2a2 2 0 110 4 2 2 0 010-4z"/></svg>
+      </div>
+      <div>
+        <h1>Web Anggaran<br>Ditbinmas Polda Aceh</h1>
+        <p>Rencana Penarikan Dana T.A. 2026</p>
+      </div>
+    </div>
+    <div class="login-motto">Humanis dan Ketulusan adalah Nafas Kami</div>
+    <div class="login-err" id="login-err">Username atau password salah.</div>
+    <div class="form-group">
+      <label>Kelompok User</label>
+      <div class="user-selector">
+        <select id="role-select">
+          <option value="">— Pilih Kelompok User —</option>
+          <option value="admin">Admin — Operator Perencanaan Renmin</option>
+          <option value="binopsnal">Pegawai — BABINOPSNAL</option>
+          <option value="satpam">Pegawai — Subdit SATPAM</option>
+          <option value="bintibsos">Pegawai — Subdit BINTIBSOS</option>
+          <option value="bhabin">Pegawai — Subdit BHABIN</option>
+          <option value="binpolmas">Pegawai — Subdit BINPOLMAS</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Username</label>
+      <input type="text" id="login-user" placeholder="Masukkan username" autocomplete="off">
+    </div>
+    <div class="form-group">
+      <label>Password</label>
+      <input type="password" id="login-pass" placeholder="••••••••">
+    </div>
+    <button class="btn-primary" onclick="doLogin()">Masuk</button>
+    <p class="login-hint">Demo: username <strong>admin</strong> &amp; password <strong>admin</strong> untuk semua akun</p>
+  </div>
+</div>
+
+<!-- ===== APP SHELL ===== -->
+<div id="app">
+  <header>
+    <div class="header-left">
+      <div class="header-logo">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2L3 7v10l9 5 9-5V7L12 2zm0 2.18L19 8v8l-7 3.82L5 16V8l7-3.82zM12 6a4 4 0 100 8 4 4 0 000-8zm0 2a2 2 0 110 4 2 2 0 010-4z"/></svg>
+      </div>
+      <div class="header-title">
+        <h2>Web Anggaran Ditbinmas</h2>
+        <p>RPD Satker T.A. 2026 — Polda Aceh</p>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="user-badge">
+        <span class="user-dot"></span>
+        <span id="header-role">-</span>
+      </div>
+      <button class="btn-logout" onclick="doLogout()">Keluar</button>
+    </div>
+  </header>
+
+  <div class="app-body">
+    <!-- NAV -->
+    <nav id="sidebar">
+      <div class="nav-label">Menu</div>
+      <!-- Nav items injected by JS -->
+    </nav>
+
+    <main id="main-content">
+      <!-- Dashboard -->
+      <div class="page" id="page-dashboard">
+        <div class="page-header">
+          <h1>Dashboard</h1>
+          <p>Ringkasan Rencana Penarikan Dana T.A. 2026</p>
+        </div>
+        <div class="stats-row" id="dash-stats"></div>
+        <div class="card">
+          <div class="card-title">Rekap Anggaran Per Subdit / Subsatker</div>
+          <div class="table-wrap" id="dash-table"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Realisasi per Triwulan (Target Kemenkeu)</div>
+          <div class="triwulan-grid" id="dash-twl"></div>
+        </div>
+      </div>
+
+      <!-- Admin: Kelola Uraian & Dana -->
+      <div class="page" id="page-admin-uraian">
+        <div class="page-header">
+          <h1>Kelola Uraian &amp; Alokasi Dana</h1>
+          <p>Atur uraian kegiatan dan alokasi dana untuk tiap subsatker</p>
+        </div>
+        <div id="admin-uraian-content"></div>
+      </div>
+
+      <!-- Subdit: Input RPD -->
+      <div class="page" id="page-input-rpd">
+        <div class="page-header">
+          <h1 id="input-rpd-title">Input RPD Bulanan</h1>
+          <p>Isi rencana penggunaan anggaran per bulan</p>
+        </div>
+        <div id="input-rpd-content"></div>
+      </div>
+
+      <!-- Rekap / Laporan -->
+      <div class="page" id="page-rekap">
+        <div class="page-header">
+          <h1 id="rekap-title">Rekap &amp; Perhitungan</h1>
+          <p>Ringkasan penyerapan anggaran dan laporan</p>
+        </div>
+        <div id="rekap-content"></div>
+      </div>
+
+      <!-- Surat / Pengajuan -->
+      <div class="page" id="page-surat">
+        <div class="page-header">
+          <h1>Pengajuan &amp; Penarikan Dana (LPD)</h1>
+          <p>Kelola surat pengajuan anggaran dan laporan pertanggungjawaban dana</p>
+        </div>
+        <div id="surat-content"></div>
+      </div>
+
+      <!-- Admin: Rekap Semua Subdit -->
+      <div class="page" id="page-rekap-all">
+        <div class="page-header">
+          <h1>Rekap Semua Subsatker</h1>
+          <p>Operator dapat melihat seluruh data RPD dan laporan semua subsatker</p>
+        </div>
+        <div id="rekap-all-content"></div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ===== MODAL SURAT ===== -->
+<div class="modal-overlay" id="modal-surat">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modal-surat-title">Pengajuan Anggaran</h3>
+      <button class="modal-close" onclick="closeModal('modal-surat')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="info-box blue" id="modal-surat-info"></div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Tanggal Surat</label>
+          <input type="date" id="surat-tgl" value="">
+        </div>
+        <div class="form-group">
+          <label>Nomor Surat (Opsional)</label>
+          <input type="text" id="surat-no" placeholder="Contoh: B/01/I/2026">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Nama Pengaju</label>
+        <input type="text" id="surat-nama" placeholder="Nama lengkap">
+      </div>
+      <div class="form-group">
+        <label>Jabatan</label>
+        <input type="text" id="surat-jabatan" placeholder="Jabatan pengaju">
+      </div>
+      <div class="form-group">
+        <label>Jumlah yang Diajukan (Rp)</label>
+        <input type="number" id="surat-jumlah" placeholder="0">
+      </div>
+      <div class="form-group">
+        <label>Keperluan / Catatan</label>
+        <textarea id="surat-catatan" placeholder="Keterangan keperluan penggunaan dana..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-surat')">Batal</button>
+      <button class="btn btn-blue" onclick="submitSurat()">Simpan Pengajuan</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL LPD ===== -->
+<div class="modal-overlay" id="modal-lpd">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Laporan Pertanggungjawaban Dana (LPD)</h3>
+      <button class="modal-close" onclick="closeModal('modal-lpd')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="info-box green" id="modal-lpd-info"></div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Tanggal Laporan</label>
+          <input type="date" id="lpd-tgl" value="">
+        </div>
+        <div class="form-group">
+          <label>Nomor LPD (Opsional)</label>
+          <input type="text" id="lpd-no" placeholder="Contoh: LPD/01/I/2026">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Nama Pelapor</label>
+        <input type="text" id="lpd-nama" placeholder="Nama lengkap">
+      </div>
+      <div class="form-group">
+        <label>Jumlah Realisasi (Rp)</label>
+        <input type="number" id="lpd-jumlah" placeholder="0">
+      </div>
+      <div class="form-group">
+        <label>Keterangan Realisasi</label>
+        <textarea id="lpd-catatan" placeholder="Jelaskan realisasi penggunaan dana..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-lpd')">Batal</button>
+      <button class="btn btn-success" onclick="submitLPD()">Simpan LPD</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL NOTIF ===== -->
+<div class="modal-overlay" id="modal-notif">
+  <div class="modal" style="width:360px;text-align:center;padding:36px">
+    <div style="font-size:36px;margin-bottom:12px" id="notif-icon">✅</div>
+    <h3 style="margin-bottom:8px" id="notif-title">Berhasil</h3>
+    <p style="font-size:13px;color:var(--gray-400)" id="notif-msg"></p>
+    <button class="btn btn-blue" style="margin-top:20px;width:100%" onclick="closeModal('modal-notif')">OK</button>
+  </div>
+</div>
+
+<script>
+// ===== CACHE / STATE =====
+const MONTHS = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+const TWLULAN_TARGET = [0.15, 0.50, 0.70, 1.00];
+
+const USERS = {
+  admin:     { role:'admin',      label:'Operator Perencanaan Renmin', unit:'SUBBAGRENMIN' },
+  binopsnal: { role:'binopsnal',  label:'BABINOPSNAL',                  unit:'BABINOPSNAL' },
+  satpam:    { role:'satpam',     label:'Subdit SATPAM',                unit:'SUBDIT SATPAM' },
+  bintibsos: { role:'bintibsos',  label:'Subdit BINTIBSOS',             unit:'SUBDIT BINTIBSOS' },
+  bhabin:    { role:'bhabin',     label:'Subdit BHABIN',                unit:'SUBDIT BHABIN' },
+  binpolmas: { role:'binpolmas',  label:'Subdit BINPOLMAS',             unit:'SUBDIT BINPOLMAS' },
+};
+
+// Initial data from Excel
+const INIT_URAIAN = {
+  binopsnal: [
+    {id:1, nama:"Supervisi Ditbinmas (1 Giat)",          anggaran:49950000},
+    {id:2, nama:"Giat Jum'at Curhat (2 Giat x 12 Bulan)",anggaran:61070000},
+    {id:3, nama:"Giat Jum'at Berkah",                    anggaran:15000000},
+    {id:4, nama:"Giat Minggu Kasih",                     anggaran:4220000},
+  ],
+  satpam: [
+    {id:1, nama:"Giat Binkamsa (10 Giat)",               anggaran:12120000},
+    {id:2, nama:"Giat Binkorpolsus (10 Giat)",            anggaran:12120000},
+    {id:3, nama:"Supervisi Giat BUJP",                    anggaran:9600000},
+    {id:4, nama:"Jaringan Internet (12 Bulan)",           anggaran:2520000},
+    {id:5, nama:"Pembinaan Satkambling",                  anggaran:20700000},
+    {id:6, nama:"Supervisi Lomba Satkamling",             anggaran:5250000},
+    {id:7, nama:"Giat ke Jkt Subditsatpam (3 Giat)",     anggaran:16200000},
+    {id:8, nama:"Penertiban / Pembinaan Satpam",          anggaran:26340000},
+    {id:9, nama:"Audit Rekomendasi BUJP",                 anggaran:28445000},
+    {id:10,nama:"Rakernis PNBP di Jakarta",               anggaran:13155000},
+    {id:11,nama:"Pejabat Pemungutan Negara",              anggaran:4440000},
+    {id:12,nama:"Bendahara Penerima",                     anggaran:3600000},
+    {id:13,nama:"Petugas Penerima PNBP",                  anggaran:2760000},
+  ],
+  bintibsos: [
+    {id:1, nama:"Giat Saweu Keude Kupi (16 Giat)",       anggaran:20288000},
+    {id:2, nama:"Giat Saweu Sikula (16 Giat)",           anggaran:20288000},
+    {id:3, nama:"Pembinaan TOMAS TOGA DAN TODAT (16 Giat)",anggaran:20288000},
+    {id:4, nama:"Pembinaan Pramuka (2 Giat)",            anggaran:10444000},
+    {id:5, nama:"Pembinaan Premanisme (1 Giat x 12 Bln)",anggaran:15000000},
+  ],
+  bhabin: [
+    {id:1, nama:"Optimalisasi Harkatpuan Bhabinkamtibmas",anggaran:37000000},
+    {id:2, nama:"ANEV BOS V2 Bhabinkamtibmas",           anggaran:31100000},
+    {id:3, nama:"Sinergritas 3 pilar Polresta & Polres Aceh Besar",anggaran:11900000},
+  ],
+  binpolmas: [
+    {id:1, nama:"Giat Katpuan Peran Polisi RW (2 Giat)", anggaran:74000000},
+    {id:2, nama:"Patroli Keamanan Sekolah (8 Giat)",     anggaran:22040000},
+    {id:3, nama:"Pembinaan Komunitas (8 Giat)",          anggaran:19540000},
+    {id:4, nama:"Kegiatan Binpolmas (6 Giat)",           anggaran:22380000},
+    {id:5, nama:"Giat FGD polisi RW (2 Giat)",           anggaran:37000000},
+  ],
+};
+
+// Cache/state
+let DB = JSON.parse(localStorage.getItem('binmas_db') || 'null') || initDB();
+let currentUser = null;
+let currentSuratContext = null;
+
+function initDB() {
+  const db = {
+    uraian: JSON.parse(JSON.stringify(INIT_URAIAN)),
+    rpd: {}, // rpd[unitKey][uraianId][monthIdx] = amount
+    surat: [], // { id, unitKey, uraianId, monthIdx, type, tgl, no, nama, jabatan, jumlah, catatan, ts }
+  };
+  // init empty rpd
+  Object.keys(INIT_URAIAN).forEach(u => {
+    db.rpd[u] = {};
+    INIT_URAIAN[u].forEach(item => { db.rpd[u][item.id] = Array(12).fill(0); });
+  });
+  return db;
+}
+
+function saveDB() { localStorage.setItem('binmas_db', JSON.stringify(DB)); }
+
+// ===== FORMAT =====
+function rupiah(n) {
+  if(!n) return 'Rp 0';
+  return 'Rp ' + Math.round(n).toLocaleString('id-ID');
+}
+function rupiahShort(n) {
+  if(!n) return '0';
+  if(n>=1e9) return (n/1e9).toFixed(1)+'M';
+  if(n>=1e6) return (n/1e6).toFixed(1)+'jt';
+  if(n>=1e3) return (n/1e3).toFixed(0)+'rb';
+  return n.toString();
+}
+
+// ===== AUTH =====
+function doLogin() {
+  const role = document.getElementById('role-select').value;
+  const user = document.getElementById('login-user').value.trim();
+  const pass = document.getElementById('login-pass').value.trim();
+  const err  = document.getElementById('login-err');
+  err.style.display='none';
+  if(!role){ err.textContent='Pilih kelompok user terlebih dahulu.'; err.style.display='block'; return; }
+  if(user !== 'admin' || pass !== 'admin'){ err.textContent='Username atau password salah.'; err.style.display='block'; return; }
+  currentUser = { ...USERS[role], key: role };
+  document.getElementById('header-role').textContent = currentUser.label;
+  document.getElementById('login-page').style.display='none';
+  document.getElementById('app').style.display='flex';
+  buildNav();
+  navigateTo('dashboard');
+}
+
+function doLogout() {
+  currentUser = null;
+  document.getElementById('login-page').style.display='flex';
+  document.getElementById('app').style.display='none';
+  document.getElementById('login-user').value='';
+  document.getElementById('login-pass').value='';
+  document.getElementById('role-select').value='';
+  document.getElementById('login-err').style.display='none';
+}
+
+// ===== NAVIGATION =====
+function buildNav() {
+  const nav = document.getElementById('sidebar');
+  const isAdmin = currentUser.role === 'admin';
+  let html = `<div class="nav-label">Utama</div>
+    <a href="#" onclick="navigateTo('dashboard')" id="nav-dashboard">
+      <span class="nav-icon">📊</span> Dashboard</a>`;
+  if(isAdmin) {
+    html += `<div class="nav-label">Admin</div>
+      <a href="#" onclick="navigateTo('admin-uraian')" id="nav-admin-uraian">
+        <span class="nav-icon">⚙️</span> Kelola Uraian &amp; Dana</a>
+      <a href="#" onclick="navigateTo('rekap-all')" id="nav-rekap-all">
+        <span class="nav-icon">📋</span> Rekap Semua Subdit</a>`;
+  } else {
+    html += `<div class="nav-label">Subdit</div>
+      <a href="#" onclick="navigateTo('input-rpd')" id="nav-input-rpd">
+        <span class="nav-icon">✏️</span> Input RPD Bulanan</a>
+      <a href="#" onclick="navigateTo('rekap')" id="nav-rekap">
+        <span class="nav-icon">📈</span> Rekap &amp; Laporan</a>
+      <a href="#" onclick="navigateTo('surat')" id="nav-surat">
+        <span class="nav-icon">📄</span> Pengajuan &amp; LPD</a>`;
+  }
+  nav.innerHTML = html;
+}
+
+function navigateTo(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
+  const el = document.getElementById('page-'+page);
+  if(el) el.classList.add('active');
+  const nav = document.getElementById('nav-'+page);
+  if(nav) nav.classList.add('active');
+  // Render
+  const renders = { dashboard: renderDashboard, 'admin-uraian': renderAdminUraian,
+    'input-rpd': renderInputRPD, rekap: renderRekap, surat: renderSurat, 'rekap-all': renderRekapAll };
+  if(renders[page]) renders[page]();
+}
+
+// ===== HELPERS =====
+function unitKeys() { return Object.keys(DB.uraian); }
+function totalAnggaran(unitKey) { return (DB.uraian[unitKey]||[]).reduce((s,u)=>s+u.anggaran,0); }
+function totalRPD(unitKey) {
+  if(!DB.rpd[unitKey]) return 0;
+  return Object.values(DB.rpd[unitKey]).reduce((s,arr)=>s+arr.reduce((a,b)=>a+b,0),0);
+}
+function grandTotal() { return unitKeys().reduce((s,k)=>s+totalAnggaran(k),0); }
+function grandRPD()   { return unitKeys().reduce((s,k)=>s+totalRPD(k),0); }
+
+function rpdByMonth(unitKey) {
+  const months = Array(12).fill(0);
+  if(!DB.rpd[unitKey]) return months;
+  Object.values(DB.rpd[unitKey]).forEach(arr => arr.forEach((v,i)=>months[i]+=v));
+  return months;
+}
+function triwulanRPD(unitKey) {
+  const m = rpdByMonth(unitKey);
+  return [m.slice(0,3).reduce((a,b)=>a+b,0), m.slice(3,6).reduce((a,b)=>a+b,0),
+          m.slice(6,9).reduce((a,b)=>a+b,0), m.slice(9,12).reduce((a,b)=>a+b,0)];
+}
+function triwulanRPDAll() {
+  const totals = [0,0,0,0];
+  unitKeys().forEach(k => { const t=triwulanRPD(k); t.forEach((v,i)=>totals[i]+=v); });
+  return totals;
+}
+
+// ===== DASHBOARD =====
+function renderDashboard() {
+  const gt = grandTotal(), gr = grandRPD();
+  const pct = gt > 0 ? (gr/gt*100).toFixed(1) : 0;
+  const twls = triwulanRPDAll();
+  const cumTwls = [twls[0], twls[0]+twls[1], twls[0]+twls[1]+twls[2], twls.reduce((a,b)=>a+b,0)];
+
+  document.getElementById('dash-stats').innerHTML = `
+    <div class="stat-card blue">
+      <div class="label">Total Pagu Anggaran</div>
+      <div class="value">${rupiahShort(gt)}</div>
+      <div class="sub">Belanja Barang 2026</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Total RPD Diisi</div>
+      <div class="value">${rupiahShort(gr)}</div>
+      <div class="sub">${pct}% dari total pagu</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Jumlah Subsatker</div>
+      <div class="value">5</div>
+      <div class="sub">Unit aktif TA 2026</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Total Pengajuan</div>
+      <div class="value">${DB.surat.filter(s=>s.type==='pengajuan').length}</div>
+      <div class="sub">Surat masuk</div>
+    </div>`;
+
+  const rows = unitKeys().map(k => {
+    const angg = totalAnggaran(k), rpd = totalRPD(k);
+    const sisa = angg - rpd;
+    const pct2 = angg > 0 ? Math.round(rpd/angg*100) : 0;
+    const barCls = pct2 > 100 ? 'danger' : pct2 > 80 ? 'ok' : 'progress-bar';
+    return `<tr>
+      <td><strong>${USERS[k]?.label||k}</strong></td>
+      <td class="td-right money">${rupiah(angg)}</td>
+      <td class="td-right money">${rupiah(rpd)}</td>
+      <td class="td-right money" style="color:${sisa<0?'var(--danger)':'var(--success)'}">${rupiah(Math.abs(sisa))}</td>
+      <td>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div class="progress-wrap" style="flex:1"><div class="progress-bar ${barCls}" style="width:${Math.min(pct2,100)}%"></div></div>
+          <span style="font-size:12px;font-weight:600;min-width:35px">${pct2}%</span>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('dash-table').innerHTML = `
+    <table>
+      <thead><tr>
+        <th>Subsatker</th><th class="td-right">Pagu Anggaran</th>
+        <th class="td-right">Total RPD</th><th class="td-right">Sisa/Lebih</th><th>Progress</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+
+  const labels = ['Triwulan I (Jan-Mar)','Triwulan II (Apr-Jun)','Triwulan III (Jul-Sep)','Triwulan IV (Okt-Des)'];
+  const targets = [15,50,70,100];
+  document.getElementById('dash-twl').innerHTML = labels.map((l,i) => {
+    const cum = cumTwls[i], pctv = gt>0 ? (cum/gt*100).toFixed(1) : 0;
+    const tgt = targets[i];
+    return `<div class="twl-card">
+      <div class="twl-label">${l}</div>
+      <div class="twl-val">${pctv}%</div>
+      <div class="progress-wrap" style="margin:4px auto;max-width:100%"><div class="progress-bar ${pctv>=tgt?'ok':''}" style="width:${Math.min(pctv,100)}%"></div></div>
+      <div class="twl-target">Target: ${tgt}%</div>
+    </div>`;
+  }).join('');
+}
+
+// ===== ADMIN URAIAN =====
+function renderAdminUraian() {
+  let html = '';
+  unitKeys().forEach(k => {
+    const label = USERS[k]?.label || k;
+    const total = totalAnggaran(k);
+    html += `<div class="card">
+      <div class="card-title">${label} <span class="pill">${rupiah(total)}</span>
+        <button class="btn btn-sm btn-blue" style="margin-left:auto" onclick="addUraian('${k}')">+ Tambah Uraian</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>#</th><th>Uraian Kegiatan</th><th class="td-right">Alokasi Dana</th><th class="td-center">Aksi</th></tr></thead>
+          <tbody id="uraian-tbody-${k}">${renderUraianRows(k)}</tbody>
+        </table>
+      </div>
+    </div>`;
+  });
+  document.getElementById('admin-uraian-content').innerHTML = html;
+}
+
+function renderUraianRows(k) {
+  return (DB.uraian[k]||[]).map((u,idx) => `
+    <tr id="uraian-row-${k}-${u.id}">
+      <td>${idx+1}</td>
+      <td><input style="width:100%;border:1px solid var(--gray-200);border-radius:5px;padding:5px 8px;font-family:var(--font);font-size:13px" 
+        value="${u.nama}" onchange="updateUraianNama('${k}',${u.id},this.value)"></td>
+      <td><input type="number" style="width:140px;border:1px solid var(--gray-200);border-radius:5px;padding:5px 8px;font-family:var(--font);font-size:13px;text-align:right"
+        value="${u.anggaran}" onchange="updateUraianDana('${k}',${u.id},this.value)"></td>
+      <td class="td-center">
+        <button class="btn btn-sm btn-danger" onclick="deleteUraian('${k}',${u.id})">Hapus</button>
+      </td>
+    </tr>`).join('');
+}
+
+function updateUraianNama(k, id, val) {
+  const u = DB.uraian[k].find(x=>x.id==id);
+  if(u) u.nama = val;
+  saveDB();
+}
+function updateUraianDana(k, id, val) {
+  const u = DB.uraian[k].find(x=>x.id==id);
+  if(u) u.anggaran = parseInt(val)||0;
+  saveDB();
+}
+function addUraian(k) {
+  const id = Math.max(0,...(DB.uraian[k]||[]).map(x=>x.id))+1;
+  DB.uraian[k].push({id, nama:'Uraian Baru', anggaran:0});
+  if(!DB.rpd[k]) DB.rpd[k] = {};
+  DB.rpd[k][id] = Array(12).fill(0);
+  saveDB();
+  document.getElementById('uraian-tbody-'+k).innerHTML = renderUraianRows(k);
+}
+function deleteUraian(k, id) {
+  if(!confirm('Hapus uraian ini?')) return;
+  DB.uraian[k] = DB.uraian[k].filter(x=>x.id!=id);
+  if(DB.rpd[k]) delete DB.rpd[k][id];
+  saveDB();
+  document.getElementById('uraian-tbody-'+k).innerHTML = renderUraianRows(k);
+}
+
+// ===== INPUT RPD =====
+function renderInputRPD() {
+  const k = currentUser.key;
+  document.getElementById('input-rpd-title').textContent = `Input RPD — ${currentUser.label}`;
+  const uraianList = DB.uraian[k] || [];
+  const total = totalAnggaran(k);
+  let html = `
+    <div class="stats-row">
+      <div class="stat-card blue">
+        <div class="label">Total Pagu</div>
+        <div class="value">${rupiahShort(total)}</div>
+        <div class="sub">Alokasi dari operator</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Total RPD Diisi</div>
+        <div class="value" id="rpd-total-val">${rupiahShort(totalRPD(k))}</div>
+        <div class="sub" id="rpd-total-sisa">${rupiah(total - totalRPD(k))} sisa</div>
+      </div>
+    </div>
+    <div class="info-box blue">ℹ️ Isi jumlah rencana penggunaan anggaran untuk setiap uraian di tiap bulan. Total tidak boleh melebihi alokasi dana yang diberikan.</div>`;
+
+  uraianList.forEach(u => {
+    const rpd = DB.rpd[k]?.[u.id] || Array(12).fill(0);
+    const totalU = rpd.reduce((a,b)=>a+b,0);
+    const sisa = u.anggaran - totalU;
+    html += `<div class="card">
+      <div class="card-title">${u.nama}
+        <span class="pill">${rupiah(u.anggaran)}</span>
+        <span class="badge ${sisa<0?'badge-red':'badge-green'}" style="margin-left:8px">
+          ${sisa<0?'Lebih':'Sisa'}: ${rupiah(Math.abs(sisa))}
+        </span>
+      </div>
+      <div class="month-grid" id="month-grid-${u.id}">
+        ${MONTHS.map((m,i) => {
+          const val = rpd[i]||0;
+          return `<div class="month-item ${val>0?'has-val':''}" id="month-item-${u.id}-${i}">
+            <label>${m}</label>
+            <input type="number" min="0" value="${val||''}" placeholder="0"
+              onchange="updateRPD('${k}',${u.id},${i},this.value)"
+              onfocus="this.select()">
+            <div class="month-total">${val>0?rupiah(val):'-'}</div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`;
+  });
+
+  document.getElementById('input-rpd-content').innerHTML = html;
+}
+
+function updateRPD(k, id, monthIdx, val) {
+  if(!DB.rpd[k]) DB.rpd[k] = {};
+  if(!DB.rpd[k][id]) DB.rpd[k][id] = Array(12).fill(0);
+  const v = parseInt(val)||0;
+  DB.rpd[k][id][monthIdx] = v;
+  saveDB();
+  // update cell style
+  const item = document.getElementById(`month-item-${id}-${monthIdx}`);
+  if(item) {
+    item.classList.toggle('has-val', v > 0);
+    item.querySelector('.month-total').textContent = v > 0 ? rupiah(v) : '-';
+  }
+  // update totals
+  const total = totalAnggaran(k);
+  const rpdTotal = totalRPD(k);
+  const tv = document.getElementById('rpd-total-val');
+  const ts = document.getElementById('rpd-total-sisa');
+  if(tv) tv.textContent = rupiahShort(rpdTotal);
+  if(ts) ts.textContent = rupiah(Math.abs(total-rpdTotal)) + (total-rpdTotal < 0 ? ' lebih' : ' sisa');
+}
+
+// ===== REKAP =====
+function renderRekap() {
+  const k = currentUser.key;
+  document.getElementById('rekap-title').textContent = `Rekap — ${currentUser.label}`;
+  renderRekapFor(k, 'rekap-content');
+}
+
+function renderRekapFor(k, containerId) {
+  const uraianList = DB.uraian[k] || [];
+  const total = totalAnggaran(k);
+  const rpd = totalRPD(k);
+  const twl = triwulanRPD(k);
+  const cumTwl = [twl[0], twl[0]+twl[1], twl[0]+twl[1]+twl[2], twl.reduce((a,b)=>a+b,0)];
+
+  let html = `
+    <div class="stats-row">
+      <div class="stat-card blue"><div class="label">Pagu</div><div class="value">${rupiahShort(total)}</div></div>
+      <div class="stat-card"><div class="label">RPD</div><div class="value">${rupiahShort(rpd)}</div></div>
+      <div class="stat-card"><div class="label">Sisa</div><div class="value" style="color:${total-rpd<0?'var(--danger)':'var(--success)'}">${rupiahShort(Math.abs(total-rpd))}</div></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Rekap Triwulan</div>
+      <div class="triwulan-grid">${['I','II','III','IV'].map((l,i)=>{
+        const pct = total>0?(cumTwl[i]/total*100).toFixed(1):0;
+        const tgt = [15,50,70,100][i];
+        return `<div class="twl-card">
+          <div class="twl-label">TW ${l}</div>
+          <div class="twl-val">${pct}%</div>
+          <div class="progress-wrap"><div class="progress-bar ${parseFloat(pct)>=tgt?'ok':''}" style="width:${Math.min(pct,100)}%"></div></div>
+          <div class="twl-target">Target ${tgt}%</div>
+          <div style="font-size:11px;color:var(--gray-400)">${rupiah(cumTwl[i])}</div>
+        </div>`;
+      }).join('')}</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Detail RPD Per Uraian</div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>#</th><th>Uraian</th><th class="td-right">Pagu</th>
+          ${MONTHS.map(m=>`<th class="td-right">${m.substring(0,3)}</th>`).join('')}
+          <th class="td-right">Total RPD</th><th class="td-right">Sisa</th></tr></thead>
+        <tbody>${uraianList.map((u,idx)=>{
+          const rpdArr = DB.rpd[k]?.[u.id]||Array(12).fill(0);
+          const tot = rpdArr.reduce((a,b)=>a+b,0);
+          const sisa = u.anggaran - tot;
+          return `<tr>
+            <td>${idx+1}</td>
+            <td>${u.nama}</td>
+            <td class="td-right money">${rupiah(u.anggaran)}</td>
+            ${rpdArr.map(v=>`<td class="td-right" style="color:${v>0?'var(--blue)':'var(--gray-400)'}">${v>0?(v/1e6).toFixed(1)+'jt':'-'}</td>`).join('')}
+            <td class="td-right money"><strong>${rupiah(tot)}</strong></td>
+            <td class="td-right money" style="color:${sisa<0?'var(--danger)':'var(--success)'}">${rupiah(Math.abs(sisa))}</td>
+          </tr>`;
+        }).join('')}
+        <tr style="background:var(--gray-50);font-weight:700">
+          <td colspan="2">JUMLAH</td>
+          <td class="td-right money">${rupiah(total)}</td>
+          ${Array(12).fill(0).map((_,i)=>{
+            const s=uraianList.reduce((a,u)=>a+(DB.rpd[k]?.[u.id]?.[i]||0),0);
+            return `<td class="td-right money">${s>0?rupiah(s):'-'}</td>`;
+          }).join('')}
+          <td class="td-right money">${rupiah(rpd)}</td>
+          <td class="td-right money" style="color:${total-rpd<0?'var(--danger)':'var(--success)'}">${rupiah(Math.abs(total-rpd))}</td>
+        </tr>
+        </tbody>
+      </table></div>
+    </div>`;
+  document.getElementById(containerId).innerHTML = html;
+}
+
+// ===== SURAT / PENGAJUAN =====
+function renderSurat() {
+  const k = currentUser.key;
+  const uraianList = DB.uraian[k] || [];
+  let html = `<div class="info-box blue">📄 Gunakan tombol <strong>Ajukan Anggaran</strong> atau <strong>LPD</strong> di samping tiap bulan untuk membuat surat pengajuan dan laporan pertanggungjawaban dana.</div>`;
+
+  uraianList.forEach(u => {
+    const rpdArr = DB.rpd[k]?.[u.id] || Array(12).fill(0);
+    html += `<div class="card">
+      <div class="card-title">${u.nama} <span class="pill">${rupiah(u.anggaran)}</span></div>
+      <table style="width:100%;font-size:13px">
+        <thead><tr>
+          <th>Bulan</th><th class="td-right">RPD</th><th>Pengajuan</th><th>LPD</th><th class="td-center">Aksi</th>
+        </tr></thead>
+        <tbody>${MONTHS.map((m,i) => {
+          const val = rpdArr[i]||0;
+          if(val===0) return `<tr><td>${m}</td><td class="td-right" style="color:var(--gray-400)">—</td><td colspan="3" style="color:var(--gray-400);font-size:12px">Tidak direncanakan</td></tr>`;
+          const pengajuan = DB.surat.filter(s=>s.unitKey===k&&s.uraianId===u.id&&s.monthIdx===i&&s.type==='pengajuan');
+          const lpd = DB.surat.filter(s=>s.unitKey===k&&s.uraianId===u.id&&s.monthIdx===i&&s.type==='lpd');
+          return `<tr>
+            <td><strong>${m}</strong></td>
+            <td class="td-right money">${rupiah(val)}</td>
+            <td>
+              ${pengajuan.map(s=>`<span class="badge badge-blue" title="${s.nama} - ${s.tgl}">📋 ${s.no||'Pengajuan'}</span> `).join('')}
+              ${pengajuan.length===0?`<span style="font-size:11px;color:var(--gray-400)">Belum ada</span>`:''}
+            </td>
+            <td>
+              ${lpd.map(s=>`<span class="badge badge-green" title="${s.nama} - ${s.tgl}">✅ ${s.no||'LPD'}</span> `).join('')}
+              ${lpd.length===0?`<span style="font-size:11px;color:var(--gray-400)">Belum ada</span>`:''}
+            </td>
+            <td class="td-center">
+              <div class="month-action-row">
+                <button class="btn btn-sm btn-blue" onclick="openSuratModal('${k}',${u.id},${i},'${m}','${u.nama}',${val},'pengajuan')">
+                  📋 Ajukan
+                </button>
+                <button class="btn btn-sm btn-success" onclick="openSuratModal('${k}',${u.id},${i},'${m}','${u.nama}',${val},'lpd')">
+                  ✅ LPD
+                </button>
+              </div>
+            </td>
+          </tr>`;
+        }).join('')}</tbody>
+      </table>
+    </div>`;
+  });
+
+  // History
+  const mySurat = DB.surat.filter(s=>s.unitKey===k).sort((a,b)=>b.ts-a.ts);
+  if(mySurat.length>0){
+    html += `<div class="card">
+      <div class="card-title">Riwayat Surat</div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Jenis</th><th>Uraian</th><th>Bulan</th><th>No. Surat</th><th>Nama</th><th class="td-right">Jumlah</th><th>Tanggal</th></tr></thead>
+        <tbody>${mySurat.map(s=>{
+          const u = (DB.uraian[k]||[]).find(x=>x.id===s.uraianId);
+          return `<tr>
+            <td><span class="badge ${s.type==='pengajuan'?'badge-blue':'badge-green'}">${s.type==='pengajuan'?'📋 Pengajuan':'✅ LPD'}</span></td>
+            <td>${u?.nama||'-'}</td>
+            <td>${MONTHS[s.monthIdx]||s.monthIdx}</td>
+            <td>${s.no||'-'}</td>
+            <td>${s.nama}</td>
+            <td class="td-right money">${rupiah(s.jumlah)}</td>
+            <td>${s.tgl}</td>
+          </tr>`;
+        }).join('')}</tbody>
+      </table></div>
+    </div>`;
+  }
+
+  document.getElementById('surat-content').innerHTML = html;
+}
+
+function openSuratModal(k, uraianId, monthIdx, bulan, uraianNama, rpdVal, type) {
+  currentSuratContext = { k, uraianId, monthIdx, type };
+  const today = new Date().toISOString().split('T')[0];
+  if(type === 'pengajuan'){
+    document.getElementById('modal-surat-title').textContent = `Pengajuan Anggaran — ${bulan}`;
+    document.getElementById('modal-surat-info').innerHTML = `<strong>Uraian:</strong> ${uraianNama}<br><strong>RPD Bulan ${bulan}:</strong> ${rupiah(rpdVal)}`;
+    document.getElementById('surat-tgl').value = today;
+    document.getElementById('surat-no').value = '';
+    document.getElementById('surat-nama').value = '';
+    document.getElementById('surat-jabatan').value = '';
+    document.getElementById('surat-jumlah').value = rpdVal||'';
+    document.getElementById('surat-catatan').value = '';
+    openModal('modal-surat');
+  } else {
+    document.getElementById('modal-lpd-info').innerHTML = `<strong>Uraian:</strong> ${uraianNama}<br><strong>RPD Bulan ${bulan}:</strong> ${rupiah(rpdVal)}`;
+    document.getElementById('lpd-tgl').value = today;
+    document.getElementById('lpd-no').value = '';
+    document.getElementById('lpd-nama').value = '';
+    document.getElementById('lpd-jumlah').value = rpdVal||'';
+    document.getElementById('lpd-catatan').value = '';
+    openModal('modal-lpd');
+  }
+}
+
+function submitSurat() {
+  const {k, uraianId, monthIdx} = currentSuratContext;
+  const nama = document.getElementById('surat-nama').value.trim();
+  if(!nama){ alert('Nama pengaju harus diisi'); return; }
+  DB.surat.push({
+    id: Date.now(), unitKey:k, uraianId, monthIdx, type:'pengajuan',
+    tgl: document.getElementById('surat-tgl').value,
+    no: document.getElementById('surat-no').value.trim(),
+    nama, jabatan: document.getElementById('surat-jabatan').value.trim(),
+    jumlah: parseInt(document.getElementById('surat-jumlah').value)||0,
+    catatan: document.getElementById('surat-catatan').value.trim(),
+    ts: Date.now()
+  });
+  saveDB();
+  closeModal('modal-surat');
+  showNotif('✅','Pengajuan Berhasil','Surat pengajuan anggaran telah disimpan.');
+  renderSurat();
+}
+
+function submitLPD() {
+  const {k, uraianId, monthIdx} = currentSuratContext;
+  const nama = document.getElementById('lpd-nama').value.trim();
+  if(!nama){ alert('Nama pelapor harus diisi'); return; }
+  DB.surat.push({
+    id: Date.now(), unitKey:k, uraianId, monthIdx, type:'lpd',
+    tgl: document.getElementById('lpd-tgl').value,
+    no: document.getElementById('lpd-no').value.trim(),
+    nama, jumlah: parseInt(document.getElementById('lpd-jumlah').value)||0,
+    catatan: document.getElementById('lpd-catatan').value.trim(),
+    ts: Date.now()
+  });
+  saveDB();
+  closeModal('modal-lpd');
+  showNotif('✅','LPD Berhasil','Laporan Pertanggungjawaban Dana telah disimpan.');
+  renderSurat();
+}
+
+// ===== REKAP ALL (Admin) =====
+function renderRekapAll() {
+  let html = '';
+  unitKeys().forEach(k => {
+    const label = USERS[k]?.label||k;
+    html += `<div style="margin-bottom:8px;font-size:16px;font-weight:700;color:var(--blue-dark);border-bottom:2px solid var(--blue-light);padding-bottom:8px;margin-top:24px">${label}</div>
+      <div id="rekap-all-${k}"></div>`;
+  });
+  document.getElementById('rekap-all-content').innerHTML = html;
+  unitKeys().forEach(k => renderRekapFor(k, `rekap-all-${k}`));
+}
+
+// ===== MODAL UTILS =====
+function openModal(id){ document.getElementById(id).classList.add('open'); }
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+function showNotif(icon,title,msg){
+  document.getElementById('notif-icon').textContent=icon;
+  document.getElementById('notif-title').textContent=title;
+  document.getElementById('notif-msg').textContent=msg;
+  openModal('modal-notif');
+}
+
+// close modal on overlay click
+document.querySelectorAll('.modal-overlay').forEach(el => {
+  el.addEventListener('click', e => { if(e.target===el) el.classList.remove('open'); });
+});
+
+// Check login on load
+window.addEventListener('load', () => {
+  // nothing — start fresh on login page
+});
+</script>
+</body>
+</html>
