@@ -1,3 +1,5 @@
 - dashboard pegawai masih terlihat anggaran subdit lain
 - kalau anggaran kurang atau lebih diberikan peringatan
 - pada halaman rekap, ajukan rpd diganti menjadi ajukan anggaran, bukan ajukan rpd
+- admin belum bisa mengisi uraian kegiatan
+- 
