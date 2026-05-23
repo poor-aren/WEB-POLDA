@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Web Anggaran — Ditbinmas Polda Aceh</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --blue:#1a4fa0;--blue-dark:#0f3270;--blue-light:#e8f0fb;--blue-mid:#2e6be6;
+  --white:#fff;--gray-50:#f7f8fa;--gray-100:#eef0f4;--gray-200:#dde1ea;
+  --gray-400:#8b95a8;--gray-700:#3d4659;--gray-900:#1a2035;
+  --success:#166534;--warning:#b86000;--danger:#c0392b;
+  --font:'Plus Jakarta Sans',sans-serif;--radius:8px;--radius-lg:12px;
+}
+body{font-family:var(--font);background:var(--gray-50);color:var(--gray-900);font-size:14px;min-height:100vh}
+
+/* LOGIN */
+#login-page{display:flex;min-height:100vh;align-items:center;justify-content:center;background:var(--gray-50)}
+.login-box{background:var(--white);border:1px solid var(--gray-200);border-radius:var(--radius-lg);padding:36px;width:420px;max-width:95vw}
+.login-logo{display:flex;align-items:center;gap:12px;margin-bottom:20px}
+.login-logo .emblem{width:46px;height:46px;background:var(--blue);border-radius:var(--radius);display:flex;align-items:center;justify-content:center}
+.login-logo .emblem svg{width:26px;height:26px;fill:white}
+.login-logo h1{font-size:16px;font-weight:700;color:var(--blue-dark);line-height:1.25}
+.login-logo p{font-size:11px;color:var(--gray-400);margin-top:2px}
+.motto{font-size:12px;color:var(--gray-400);font-style:italic;border-left:3px solid var(--blue);padding-left:10px;margin-bottom:24px;line-height:1.5}
+.fg{margin-bottom:14px}
+.fg label{display:block;font-size:11px;font-weight:700;color:var(--gray-700);margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px}
+.fg input,.fg select{width:100%;padding:10px 12px;border:1px solid var(--gray-200);border-radius:var(--radius);font-family:var(--font);font-size:14px;color:var(--gray-900);background:var(--white);outline:none;transition:border .2s;-webkit-appearance:none}
+.fg input:focus,.fg select:focus{border-color:var(--blue-mid)}
+.sel-wrap{position:relative}
+.sel-wrap::after{content:'▾';position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--gray-400);pointer-events:none;font-size:12px}
+.btn-login{width:100%;padding:11px;background:var(--blue);color:var(--white);border:none;border-radius:var(--radius);font-family:var(--font);font-size:14px;font-weight:700;cursor:pointer;transition:background .2s;margin-top:4px}
+.btn-login:hover{background:var(--blue-dark)}
+.login-hint{margin-top:12px;font-size:12px;color:var(--gray-400);text-align:center}
+.login-err{background:#fef2f2;border:1px solid #fca5a5;border-radius:var(--radius);padding:10px 12px;color:#991b1b;font-size:13px;margin-bottom:12px;display:none}
+
+/* APP */
+#app{display:none;flex-direction:column;min-height:100vh}
+
+/* HEADER */
+header{background:var(--blue-dark);color:#fff;height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;position:sticky;top:0;z-index:200;border-bottom:2px solid var(--blue)}
+.h-left{display:flex;align-items:center;gap:10px}
+.h-emblem{width:30px;height:30px;background:#fff;border-radius:6px;display:flex;align-items:center;justify-content:center}
+.h-emblem svg{width:18px;height:18px;fill:var(--blue-dark)}
+.h-title{font-size:14px;font-weight:700}
+.h-sub{font-size:10px;color:rgba(255,255,255,.55);margin-top:1px}
+.h-right{display:flex;align-items:center;gap:8px}
+.user-tag{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:6px;padding:4px 10px;font-size:11px;display:flex;align-items:center;gap:6px}
+.udot{width:6px;height:6px;border-radius:50%;background:#4ade80;flex-shrink:0}
+.btn-out{background:none;border:1px solid rgba(255,255,255,.25);color:rgba(255,255,255,.8);padding:4px 10px;border-radius:6px;cursor:pointer;font-size:11px;font-family:var(--font);transition:all .2s}
+.btn-out:hover{background:rgba(255,255,255,.12)}
+
+/* BOTTOM NAV — mobile */
+.bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--white);border-top:1px solid var(--gray-200);z-index:200;padding:0}
+.bottom-nav a{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;padding:8px 4px;color:var(--gray-400);text-decoration:none;font-size:10px;font-weight:500;gap:3px;border-top:2px solid transparent;transition:all .2s}
+.bottom-nav a.active{color:var(--blue);border-top-color:var(--blue)}
+.bottom-nav a span.ico{font-size:20px;line-height:1}
+.bnav-inner{display:flex}
+
+/* SIDE NAV — desktop */
+.app-body{display:flex;flex:1}
+.sidenav{width:210px;background:var(--white);border-right:1px solid var(--gray-200);padding:14px 0;flex-shrink:0;position:sticky;top:52px;height:calc(100vh - 52px);overflow-y:auto}
+.sidenav .snlabel{font-size:10px;font-weight:700;color:var(--gray-400);letter-spacing:1px;text-transform:uppercase;padding:12px 18px 5px}
+.sidenav a{display:flex;align-items:center;gap:9px;padding:9px 18px;color:var(--gray-700);text-decoration:none;font-size:13px;font-weight:500;transition:all .15s;border-left:3px solid transparent}
+.sidenav a:hover{background:var(--gray-50);color:var(--blue)}
+.sidenav a.active{background:var(--blue-light);color:var(--blue);border-left-color:var(--blue);font-weight:600}
+.sidenav a .sico{font-size:16px;width:20px;text-align:center}
+
+/* MAIN */
+main{flex:1;padding:20px;overflow-x:hidden;padding-bottom:80px}
+.page{display:none}
+.page.active{display:block}
+.ph{margin-bottom:20px}
+.ph h1{font-size:18px;font-weight:700;color:var(--gray-900)}
+.ph p{font-size:12px;color:var(--gray-400);margin-top:2px}
+
+/* CARDS */
+.card{background:var(--white);border:1px solid var(--gray-200);border-radius:var(--radius-lg);padding:18px;margin-bottom:16px}
+.ct{font-size:13px;font-weight:700;color:var(--gray-900);margin-bottom:14px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.pill{font-size:11px;font-weight:600;padding:2px 8px;border-radius:20px;background:var(--blue-light);color:var(--blue)}
+
+/* STATS */
+.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:18px}
+.sc{background:var(--white);border:1px solid var(--gray-200);border-radius:var(--radius);padding:12px 14px}
+.sc .lbl{font-size:10px;color:var(--gray-400);font-weight:700;text-transform:uppercase;letter-spacing:.4px}
+.sc .val{font-size:20px;font-weight:700;color:var(--gray-900);margin-top:3px}
+.sc .sub{font-size:10px;color:var(--gray-400);margin-top:1px}
+.sc.blue{background:var(--blue-light);border-color:#c7dbf5}
+.sc.blue .val{color:var(--blue)}
+
+/* TABLE */
+.tw{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table{width:100%;border-collapse:collapse;font-size:12px;min-width:900px}
+thead th{background:var(--blue-dark);color:#fff;font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.3px;padding:9px 10px;text-align:left;white-space:nowrap;position:sticky;top:0}
+thead th.tr{text-align:right}
+thead th.tc{text-align:center}
+tbody td{padding:9px 10px;border-bottom:1px solid var(--gray-100);vertical-align:middle}
+tbody tr:hover td{background:var(--gray-50)}
+tbody tr:last-child td{border-bottom:none}
+.tr{text-align:right}
+.tc{text-align:center}
+.money{font-variant-numeric:tabular-nums;font-weight:500;white-space:nowrap}
+tfoot td{padding:9px 10px;background:var(--blue-dark);color:#fff;font-weight:700;font-size:12px}
+tfoot td.tr{text-align:right}
+
+/* BADGES */
+.badge{display:inline-block;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;white-space:nowrap}
+.b-blue{background:var(--blue-light);color:var(--blue)}
+.b-green{background:#dcfce7;color:#166534}
+.b-gray{background:var(--gray-100);color:var(--gray-700)}
+.b-red{background:#fef2f2;color:#991b1b}
+.b-orange{background:#fff7ed;color:#9a3412}
+
+/* PROGRESS */
+.pw{background:var(--gray-100);border-radius:20px;height:5px;overflow:hidden;min-width:60px}
+.pb{height:100%;border-radius:20px;background:var(--blue-mid)}
+.pb.ok{background:#16a34a}
+.pb.warn{background:#d97706}
+.pb.danger{background:var(--danger)}
+
+/* TRIWULAN */
+.twl-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:10px}
+.twlc{border:1px solid var(--gray-200);border-radius:var(--radius);padding:12px;text-align:center}
+.twlc .tl{font-size:10px;color:var(--gray-400);font-weight:700;text-transform:uppercase}
+.twlc .tv{font-size:17px;font-weight:700;color:var(--blue);margin:5px 0 3px}
+.twlc .tt{font-size:10px;color:var(--gray-400)}
+
+/* INLINE INPUT in table */
+.mi{width:100%;border:1px solid var(--gray-200);border-radius:5px;padding:5px 7px;font-family:var(--font);font-size:12px;font-weight:500;color:var(--blue-dark);text-align:right;outline:none;min-width:90px;background:var(--white)}
+.mi:focus{border-color:var(--blue-mid);background:var(--blue-light)}
+.mi.filled{background:#f0f7ff;border-color:#c7dbf5}
+
+/* SURAT modal trigger btn */
+.btn-surat{display:inline-flex;align-items:center;gap:4px;padding:4px 9px;border-radius:5px;font-family:var(--font);font-size:11px;font-weight:600;cursor:pointer;border:none;transition:all .15s;white-space:nowrap}
+.btn-surat.blue{background:var(--blue);color:#fff}
+.btn-surat.blue:hover{background:var(--blue-dark)}
+
+/* SURAT list mini */
+.surat-chips{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
+
+/* MODAL */
+.mov{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:500;display:none;align-items:center;justify-content:center;padding:12px}
+.mov.open{display:flex}
+.modal{background:var(--white);border-radius:var(--radius-lg);padding:24px;width:480px;max-width:100%;max-height:92vh;overflow-y:auto}
+.mh{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+.mh h3{font-size:15px;font-weight:700;color:var(--gray-900)}
+.mclose{background:none;border:none;font-size:22px;cursor:pointer;color:var(--gray-400);line-height:1;padding:2px 6px}
+.mclose:hover{color:var(--gray-900)}
+.mfg{margin-bottom:12px}
+.mfg label{display:block;font-size:11px;font-weight:700;color:var(--gray-700);margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px}
+.mfg input,.mfg select,.mfg textarea{width:100%;padding:9px 11px;border:1px solid var(--gray-200);border-radius:var(--radius);font-family:var(--font);font-size:13px;outline:none}
+.mfg input:focus,.mfg select:focus,.mfg textarea:focus{border-color:var(--blue-mid)}
+.mfg textarea{resize:vertical;min-height:70px}
+.mfooter{display:flex;gap:8px;justify-content:flex-end;margin-top:18px;padding-top:14px;border-top:1px solid var(--gray-100)}
+.mrow{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:8px 16px;border-radius:var(--radius);font-family:var(--font);font-size:13px;font-weight:600;cursor:pointer;border:1px solid transparent;transition:all .15s}
+.btn.pri{background:var(--blue);color:#fff;border-color:var(--blue)}
+.btn.pri:hover{background:var(--blue-dark)}
+.btn.sec{background:var(--white);color:var(--gray-700);border-color:var(--gray-200)}
+.btn.sec:hover{border-color:var(--blue);color:var(--blue)}
+.ibox{padding:10px 12px;border-radius:var(--radius);font-size:12px;margin-bottom:14px;line-height:1.6}
+.ibox.blue{background:var(--blue-light);border:1px solid #c7dbf5;color:var(--blue-dark)}
+.ibox.green{background:#dcfce7;border:1px solid #bbf7d0;color:#166534}
+.ibox.orange{background:#fff7ed;border:1px solid #fed7aa;color:#9a3412}
+
+/* URAIAN editor */
+.ue-row{display:flex;align-items:center;gap:6px;margin-bottom:6px;padding:8px 10px;background:var(--gray-50);border-radius:var(--radius);border:1px solid var(--gray-200)}
+.ue-row input{border:1px solid var(--gray-200);border-radius:5px;padding:6px 9px;font-family:var(--font);font-size:13px;background:var(--white);outline:none}
+.ue-row input:focus{border-color:var(--blue-mid)}
+.ue-row .ui{flex:1}
+.ue-row .ud{width:160px;text-align:right}
+.ue-del{padding:5px 9px;border:none;border-radius:5px;cursor:pointer;background:#fef2f2;color:#991b1b;font-size:12px;font-weight:600}
+
+/* NOTIF */
+.notif-box{background:var(--white);border-radius:var(--radius-lg);padding:32px;width:320px;max-width:95vw;text-align:center}
+.notif-box .ni{font-size:36px;margin-bottom:10px}
+.notif-box h3{font-size:15px;font-weight:700;margin-bottom:6px}
+.notif-box p{font-size:12px;color:var(--gray-400)}
+
+@media(max-width:700px){
+  .sidenav{display:none}
+  .bottom-nav{display:flex}
+  main{padding:14px;padding-bottom:72px}
+  .stats-row{grid-template-columns:1fr 1fr}
+  .twl-grid{grid-template-columns:1fr 1fr}
+  table{min-width:700px}
+  .mrow{grid-template-columns:1fr}
+  .h-sub{display:none}
+  .user-tag{max-width:140px;overflow:hidden}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-page">
+  <div class="login-box">
+    <div class="login-logo">
+      <div class="emblem">
+        <svg viewBox="0 0 24 24"><path d="M12 2L3 7v10l9 5 9-5V7L12 2zm0 2.18L19 8v8l-7 3.82L5 16V8l7-3.82zM12 6a4 4 0 100 8 4 4 0 000-8zm0 2a2 2 0 110 4 2 2 0 010-4z"/></svg>
+      </div>
+      <div>
+        <h1>Web Anggaran Ditbinmas<br>Polda Aceh</h1>
+        <p>RPD Satker T.A. 2026</p>
+      </div>
+    </div>
+    <div class="motto">Humanis dan Ketulusan adalah Nafas Kami</div>
+    <div class="login-err" id="login-err">Username atau password salah.</div>
+    <div class="fg">
+      <label>Kelompok User</label>
+      <div class="sel-wrap">
+        <select id="role-select">
+          <option value="">— Pilih Kelompok User —</option>
+          <option value="admin">Admin — Operator Perencanaan Renmin</option>
+          <option value="binopsnal">Pegawai — BABINOPSNAL</option>
+          <option value="satpam">Pegawai — Subdit SATPAM</option>
+          <option value="bintibsos">Pegawai — Subdit BINTIBSOS</option>
+          <option value="bhabin">Pegawai — Subdit BHABIN</option>
+          <option value="binpolmas">Pegawai — Subdit BINPOLMAS</option>
+        </select>
+      </div>
+    </div>
+    <div class="fg">
+      <label>Username</label>
+      <input type="text" id="lu" placeholder="Username" autocomplete="off">
+    </div>
+    <div class="fg">
+      <label>Password</label>
+      <input type="password" id="lp" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <button class="btn-login" onclick="doLogin()">Masuk</button>
+    <p class="login-hint">Username & password: <strong>admin</strong></p>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <header>
+    <div class="h-left">
+      <div class="h-emblem">
+        <svg viewBox="0 0 24 24"><path d="M12 2L3 7v10l9 5 9-5V7L12 2zm0 2.18L19 8v8l-7 3.82L5 16V8l7-3.82zM12 6a4 4 0 100 8 4 4 0 000-8zm0 2a2 2 0 110 4 2 2 0 010-4z"/></svg>
+      </div>
+      <div>
+        <div class="h-title">Web Anggaran Ditbinmas</div>
+        <div class="h-sub">RPD Satker T.A. 2026 — Polda Aceh</div>
+      </div>
+    </div>
+    <div class="h-right">
+      <div class="user-tag"><span class="udot"></span><span id="hdr-role">-</span></div>
+      <button class="btn-out" onclick="doLogout()">Keluar</button>
+    </div>
+  </header>
+
+  <div class="app-body">
+    <!-- Side nav desktop -->
+    <nav class="sidenav" id="sidenav"></nav>
+
+    <main id="main-content">
+      <!-- DASHBOARD -->
+      <div class="page" id="page-dashboard">
+        <div class="ph"><h1>Dashboard</h1><p>Ringkasan Rencana Penarikan Dana T.A. 2026</p></div>
+        <div class="stats-row" id="dash-stats"></div>
+        <div class="card"><div class="ct">Rekap Anggaran Per Subsatker</div><div class="tw" id="dash-table"></div></div>
+        <div class="card"><div class="ct">Progres Triwulan vs Target Kemenkeu</div><div class="twl-grid" id="dash-twl"></div></div>
+      </div>
+
+      <!-- RPD (pegawai) — tabel spreadsheet dengan kolom pengajuan -->
+      <div class="page" id="page-rpd">
+        <div class="ph"><h1 id="rpd-h1">RPD &amp; Pengajuan</h1><p id="rpd-sub">Isi rencana penarikan dana per bulan dan buat pengajuan</p></div>
+        <div id="rpd-content"></div>
+      </div>
+
+      <!-- REKAP (pegawai - hanya unit sendiri) -->
+      <div class="page" id="page-rekap">
+        <div class="ph"><h1 id="rekap-h1">Rekap</h1><p>Rekap penyerapan anggaran unit Anda</p></div>
+        <div id="rekap-content"></div>
+      </div>
+
+      <!-- ADMIN: kelola uraian + lihat rekap semua -->
+      <div class="page" id="page-admin">
+        <div class="ph"><h1>Kelola &amp; Rekap Semua Subsatker</h1><p>Atur uraian, alokasi dana, dan lihat rekap seluruh subsatker</p></div>
+        <div id="admin-content"></div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Bottom nav mobile -->
+  <nav class="bottom-nav" id="bottom-nav">
+    <div class="bnav-inner" id="bnav-inner"></div>
+  </nav>
+</div>
+
+<!-- MODAL PENGAJUAN -->
+<div class="mov" id="mod-surat">
+  <div class="modal">
+    <div class="mh">
+      <h3>📋 Pengajuan RPD</h3>
+      <button class="mclose" onclick="closeModal('mod-surat')">×</button>
+    </div>
+    <div class="ibox blue" id="ms-info"></div>
+    <div class="mrow">
+      <div class="mfg"><label>Tanggal Surat</label><input type="date" id="ms-tgl"></div>
+      <div class="mfg"><label>Nomor Surat (Opsional)</label><input type="text" id="ms-no" placeholder="B/01/I/2026"></div>
+    </div>
+    <div class="mrow">
+      <div class="mfg"><label>Nama Pengaju</label><input type="text" id="ms-nama" placeholder="Nama lengkap"></div>
+      <div class="mfg"><label>Jabatan</label><input type="text" id="ms-jab" placeholder="Jabatan"></div>
+    </div>
+    <div class="mfg"><label>Jumlah yang Diajukan (Rp)</label><input type="number" id="ms-jml" placeholder="0"></div>
+    <div class="mfg"><label>Keperluan / Catatan</label><textarea id="ms-cat" placeholder="Keterangan..."></textarea></div>
+    <div class="mfooter">
+      <button class="btn sec" onclick="closeModal('mod-surat')">Batal</button>
+      <button class="btn pri" onclick="submitSurat()">Simpan Pengajuan</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL NOTIF -->
+<div class="mov" id="mod-notif">
+  <div class="notif-box">
+    <div class="ni" id="ni-icon">✅</div>
+    <h3 id="ni-title">Berhasil</h3>
+    <p id="ni-msg"></p>
+    <button class="btn pri" style="margin-top:18px;width:100%" onclick="closeModal('mod-notif')">OK</button>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// DATA
+// ============================================================
+const MONTHS=['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+const M3=['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+
+const USERS={
+  admin:    {label:'Operator Perencanaan Renmin'},
+  binopsnal:{label:'BABINOPSNAL'},
+  satpam:   {label:'Subdit SATPAM'},
+  bintibsos:{label:'Subdit BINTIBSOS'},
+  bhabin:   {label:'Subdit BHABIN'},
+  binpolmas:{label:'Subdit BINPOLMAS'},
+};
+
+const INIT_URAIAN={
+  binopsnal:[
+    {id:1,nama:"Supervisi Ditbinmas (1 Giat)",anggaran:49950000},
+    {id:2,nama:"Giat Jum'at Curhat (2 Giat x 12 Bulan)",anggaran:61070000},
+    {id:3,nama:"Giat Jum'at Berkah",anggaran:15000000},
+    {id:4,nama:"Giat Minggu Kasih",anggaran:4220000},
+  ],
+  satpam:[
+    {id:1,nama:"Giat Binkamsa (10 Giat)",anggaran:12120000},
+    {id:2,nama:"Giat Binkorpolsus (10 Giat)",anggaran:12120000},
+    {id:3,nama:"Supervisi Giat BUJP",anggaran:9600000},
+    {id:4,nama:"Jaringan Internet (12 Bulan)",anggaran:2520000},
+    {id:5,nama:"Pembinaan Satkambling",anggaran:20700000},
+    {id:6,nama:"Supervisi Lomba Satkamling",anggaran:5250000},
+    {id:7,nama:"Giat ke Jkt Subditsatpam (3 Giat)",anggaran:16200000},
+    {id:8,nama:"Penertiban / Pembinaan Satpam",anggaran:26340000},
+    {id:9,nama:"Audit Rekomendasi BUJP",anggaran:28445000},
+    {id:10,nama:"Rakernis PNBP di Jakarta",anggaran:13155000},
+    {id:11,nama:"Pejabat Pemungutan Negara",anggaran:4440000},
+    {id:12,nama:"Bendahara Penerima",anggaran:3600000},
+    {id:13,nama:"Petugas Penerima PNBP",anggaran:2760000},
+  ],
+  bintibsos:[
+    {id:1,nama:"Giat Saweu Keude Kupi (16 Giat)",anggaran:20288000},
+    {id:2,nama:"Giat Saweu Sikula (16 Giat)",anggaran:20288000},
+    {id:3,nama:"Pembinaan TOMAS TOGA DAN TODAT (16 Giat)",anggaran:20288000},
+    {id:4,nama:"Pembinaan Pramuka (2 Giat)",anggaran:10444000},
+    {id:5,nama:"Pembinaan Premanisme (1 Giat x 12 Bln)",anggaran:15000000},
+  ],
+  bhabin:[
+    {id:1,nama:"Optimalisasi Harkatpuan Bhabinkamtibmas",anggaran:37000000},
+    {id:2,nama:"ANEV BOS V2 Bhabinkamtibmas",anggaran:31100000},
+    {id:3,nama:"Sinergritas 3 Pilar Polresta & Polres Aceh Besar",anggaran:11900000},
+  ],
+  binpolmas:[
+    {id:1,nama:"Giat Katpuan Peran Polisi RW (2 Giat)",anggaran:74000000},
+    {id:2,nama:"Patroli Keamanan Sekolah (8 Giat)",anggaran:22040000},
+    {id:3,nama:"Pembinaan Komunitas (8 Giat)",anggaran:19540000},
+    {id:4,nama:"Kegiatan Binpolmas (6 Giat)",anggaran:22380000},
+    {id:5,nama:"Giat FGD Polisi RW (2 Giat)",anggaran:37000000},
+  ],
+};
+
+function initDB(){
+  const db={uraian:JSON.parse(JSON.stringify(INIT_URAIAN)),rpd:{},surat:[]};
+  Object.keys(INIT_URAIAN).forEach(k=>{
+    db.rpd[k]={};
+    INIT_URAIAN[k].forEach(u=>{db.rpd[k][u.id]=Array(12).fill(0);});
+  });
+  return db;
+}
+
+let DB=JSON.parse(localStorage.getItem('bm_db')||'null')||initDB();
+let CU=null; // current user
+let SC=null; // surat context
+
+function saveDB(){localStorage.setItem('bm_db',JSON.stringify(DB));}
+
+// ============================================================
+// FORMAT
+// ============================================================
+function rp(n){if(!n)return'Rp 0';return'Rp '+Math.round(n).toLocaleString('id-ID');}
+function rpShort(n){if(!n)return'0';if(n>=1e9)return(n/1e9).toFixed(1)+'M';if(n>=1e6)return(n/1e6).toFixed(1)+'jt';if(n>=1e3)return(n/1e3).toFixed(0)+'rb';return n.toString();}
+
+// ============================================================
+// AUTH
+// ============================================================
+function doLogin(){
+  const role=document.getElementById('role-select').value;
+  const user=document.getElementById('lu').value.trim();
+  const pass=document.getElementById('lp').value.trim();
+  const err=document.getElementById('login-err');
+  err.style.display='none';
+  if(!role){err.textContent='Pilih kelompok user terlebih dahulu.';err.style.display='block';return;}
+  if(user!=='admin'||pass!=='admin'){err.textContent='Username atau password salah.';err.style.display='block';return;}
+  CU={role,key:role,label:USERS[role]?.label||role};
+  document.getElementById('hdr-role').textContent=CU.label;
+  document.getElementById('login-page').style.display='none';
+  document.getElementById('app').style.display='flex';
+  buildNav();
+  nav_to('dashboard');
+}
+function doLogout(){
+  CU=null;
+  document.getElementById('login-page').style.display='flex';
+  document.getElementById('app').style.display='none';
+  document.getElementById('lu').value='';
+  document.getElementById('lp').value='';
+  document.getElementById('role-select').value='';
+  document.getElementById('login-err').style.display='none';
+}
+
+// ============================================================
+// NAV
+// ============================================================
+function buildNav(){
+  const isAdmin=CU.role==='admin';
+  let items=[];
+  if(isAdmin){
+    items=[
+      {id:'dashboard',ico:'📊',label:'Dashboard'},
+      {id:'admin',ico:'⚙️',label:'Kelola & Rekap'},
+    ];
+  } else {
+    items=[
+      {id:'dashboard',ico:'📊',label:'Dashboard'},
+      {id:'rpd',ico:'📝',label:'RPD & Pengajuan'},
+      {id:'rekap',ico:'📈',label:'Rekap'},
+    ];
+  }
+
+  // sidebar
+  let shtml='<div class="snlabel">Menu</div>';
+  items.forEach(it=>{shtml+=`<a href="#" onclick="nav_to('${it.id}');return false" id="sn-${it.id}"><span class="sico">${it.ico}</span>${it.label}</a>`;});
+  document.getElementById('sidenav').innerHTML=shtml;
+
+  // bottom nav
+  let bhtml='';
+  items.forEach(it=>{bhtml+=`<a href="#" onclick="nav_to('${it.id}');return false" id="bn-${it.id}"><span class="ico">${it.ico}</span>${it.label}</a>`;});
+  document.getElementById('bnav-inner').innerHTML=bhtml;
+  document.getElementById('bottom-nav').style.display='flex';
+}
+
+function nav_to(page){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.sidenav a, .bottom-nav a').forEach(a=>a.classList.remove('active'));
+  const pg=document.getElementById('page-'+page);
+  if(pg) pg.classList.add('active');
+  ['sn-'+page,'bn-'+page].forEach(id=>{const el=document.getElementById(id);if(el)el.classList.add('active');});
+  const fn={dashboard:renderDashboard,rpd:renderRPD,rekap:renderRekap,admin:renderAdmin};
+  if(fn[page])fn[page]();
+}
+
+// ============================================================
+// HELPERS
+// ============================================================
+function unitKeys(){return Object.keys(DB.uraian);}
+function totalAngg(k){return(DB.uraian[k]||[]).reduce((s,u)=>s+u.anggaran,0);}
+function totalRPD(k){if(!DB.rpd[k])return 0;return Object.values(DB.rpd[k]).reduce((s,a)=>s+a.reduce((x,y)=>x+y,0),0);}
+function rpdByMonth(k){const m=Array(12).fill(0);if(!DB.rpd[k])return m;Object.values(DB.rpd[k]).forEach(a=>a.forEach((v,i)=>m[i]+=v));return m;}
+function triwulan(k){const m=rpdByMonth(k);return[m.slice(0,3).reduce((a,b)=>a+b,0),m.slice(3,6).reduce((a,b)=>a+b,0),m.slice(6,9).reduce((a,b)=>a+b,0),m.slice(9,12).reduce((a,b)=>a+b,0)];}
+function triwulanAll(){const t=[0,0,0,0];unitKeys().forEach(k=>{const tw=triwulan(k);tw.forEach((v,i)=>t[i]+=v);});return t;}
+function grandAngg(){return unitKeys().reduce((s,k)=>s+totalAngg(k),0);}
+function grandRPD(){return unitKeys().reduce((s,k)=>s+totalRPD(k),0);}
+
+// ============================================================
+// DASHBOARD
+// ============================================================
+function renderDashboard(){
+  const gt=grandAngg(),gr=grandRPD();
+  const pct=gt>0?(gr/gt*100).toFixed(1):0;
+
+  document.getElementById('dash-stats').innerHTML=`
+    <div class="sc blue"><div class="lbl">Total Pagu Anggaran</div><div class="val">${rpShort(gt)}</div><div class="sub">Belanja Barang 2026</div></div>
+    <div class="sc"><div class="lbl">Total RPD Diisi</div><div class="val">${rpShort(gr)}</div><div class="sub">${pct}% dari pagu</div></div>
+    <div class="sc"><div class="lbl">Subsatker</div><div class="val">5</div><div class="sub">Unit aktif</div></div>
+    <div class="sc"><div class="lbl">Total Pengajuan</div><div class="val">${DB.surat.length}</div><div class="sub">Surat masuk</div></div>`;
+
+  const rows=unitKeys().map(k=>{
+    const a=totalAngg(k),r=totalRPD(k),s=a-r,p=a>0?Math.round(r/a*100):0;
+    const bc=p>100?'danger':p>=80?'ok':'pb';
+    return`<tr>
+      <td><strong>${USERS[k]?.label||k}</strong></td>
+      <td class="tr money">${rp(a)}</td>
+      <td class="tr money">${rp(r)}</td>
+      <td class="tr money" style="color:${s<0?'var(--danger)':'var(--success)'}">${rp(Math.abs(s))}</td>
+      <td><div style="display:flex;align-items:center;gap:6px"><div class="pw" style="flex:1"><div class="pb ${bc}" style="width:${Math.min(p,100)}%"></div></div><span style="font-size:11px;font-weight:600;min-width:30px">${p}%</span></div></td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('dash-table').innerHTML=`<table>
+    <thead><tr><th>Subsatker</th><th class="tr">Pagu Anggaran</th><th class="tr">Total RPD</th><th class="tr">Sisa / Lebih</th><th>Progress</th></tr></thead>
+    <tbody>${rows}</tbody></table>`;
+
+  const twls=triwulanAll();
+  const cum=[twls[0],twls[0]+twls[1],twls[0]+twls[1]+twls[2],twls.reduce((a,b)=>a+b,0)];
+  const tgts=[15,50,70,100];
+  document.getElementById('dash-twl').innerHTML=['I','II','III','IV'].map((l,i)=>{
+    const p=gt>0?(cum[i]/gt*100).toFixed(1):0;
+    const bc=parseFloat(p)>=tgts[i]?'ok':'pb';
+    return`<div class="twlc">
+      <div class="tl">Triwulan ${l}</div>
+      <div class="tv">${p}%</div>
+      <div class="pw" style="margin:4px auto"><div class="pb ${bc}" style="width:${Math.min(p,100)}%"></div></div>
+      <div class="tt">Target ${tgts[i]}%</div>
+      <div style="font-size:10px;color:var(--gray-400);margin-top:3px">${rp(cum[i])}</div>
+    </div>`;
+  }).join('');
+}
+
+// ============================================================
+// RPD & PENGAJUAN (PEGAWAI) — tabel spreadsheet
+// ============================================================
+function renderRPD(){
+  const k=CU.key;
+  document.getElementById('rpd-h1').textContent=`RPD & Pengajuan — ${CU.label}`;
+  const uraianList=DB.uraian[k]||[];
+  const totalA=totalAngg(k),totalR=totalRPD(k);
+
+  let html=`<div class="stats-row">
+    <div class="sc blue"><div class="lbl">Total Pagu</div><div class="val">${rpShort(totalA)}</div></div>
+    <div class="sc"><div class="lbl">Total RPD</div><div class="val" id="rpd-tv">${rpShort(totalR)}</div></div>
+    <div class="sc"><div class="lbl">Sisa</div><div class="val" id="rpd-sv" style="color:${totalA-totalR<0?'var(--danger)':'var(--success)'}">${rpShort(Math.abs(totalA-totalR))}</div></div>
+  </div>
+  <div class="ibox blue">ℹ️ Isi jumlah RPD per bulan pada kolom bulan. Klik <strong>Ajukan</strong> di kolom paling kanan untuk membuat pengajuan anggaran bulan tersebut.</div>
+  <div class="card" style="padding:0">
+  <div class="tw"><table>
+    <thead><tr>
+      <th style="min-width:180px">Uraian Kegiatan</th>
+      <th class="tr">Total Pagu</th>
+      ${M3.map(m=>`<th class="tr">${m}</th>`).join('')}
+      <th class="tr">Total RPD</th>
+      <th class="tc">Pengajuan RPD</th>
+    </tr></thead>
+    <tbody>
+    ${uraianList.map(u=>{
+      const rpdArr=DB.rpd[k]?.[u.id]||Array(12).fill(0);
+      const tot=rpdArr.reduce((a,b)=>a+b,0);
+      const sisa=u.anggaran-tot;
+      const pengList=DB.surat.filter(s=>s.unitKey===k&&s.uraianId===u.id);
+      const chips=pengList.map(s=>`<span class="badge b-blue" title="${s.nama} — ${rp(s.jumlah)} — ${s.tgl}">${s.no||'Pengajuan'}</span>`).join(' ');
+      return`<tr>
+        <td>${u.nama}<br><small style="color:${sisa<0?'var(--danger)':'var(--gray-400)'};font-size:10px">Sisa: ${rp(Math.abs(sisa))}${sisa<0?' (Lebih)':''}</small></td>
+        <td class="tr money">${rp(u.anggaran)}</td>
+        ${rpdArr.map((v,i)=>`<td class="tr"><input class="mi${v>0?' filled':''}" type="number" min="0" value="${v||''}" placeholder="-"
+          onchange="updateRPD('${k}',${u.id},${i},this.value)"
+          onfocus="this.select()"
+          style="width:90px"></td>`).join('')}
+        <td class="tr money" id="urt-${u.id}"><strong style="color:${tot>u.anggaran?'var(--danger)':'var(--blue)'}">${rp(tot)}</strong></td>
+        <td class="tc">
+          <button class="btn-surat blue" onclick="openSurat('${k}',${u.id},'${u.nama.replace(/'/g,"\\'")}',${u.anggaran})">📋 Ajukan</button>
+          ${chips?`<div class="surat-chips" style="margin-top:5px;justify-content:center">${chips}</div>`:''}
+        </td>
+      </tr>`;
+    }).join('')}
+    </tbody>
+    <tfoot><tr>
+      <td>JUMLAH</td>
+      <td class="tr">${rp(totalA)}</td>
+      ${Array(12).fill(0).map((_,i)=>{
+        const s=uraianList.reduce((a,u)=>a+(DB.rpd[k]?.[u.id]?.[i]||0),0);
+        return`<td class="tr">${s>0?rp(s):'-'}</td>`;
+      }).join('')}
+      <td class="tr">${rp(totalR)}</td>
+      <td></td>
+    </tr></tfoot>
+  </table></div></div>`;
+
+  document.getElementById('rpd-content').innerHTML=html;
+}
+
+function updateRPD(k,id,mi,val){
+  if(!DB.rpd[k])DB.rpd[k]={};
+  if(!DB.rpd[k][id])DB.rpd[k][id]=Array(12).fill(0);
+  const v=parseInt(val)||0;
+  DB.rpd[k][id][mi]=v;
+  saveDB();
+  // update row total
+  const arr=DB.rpd[k][id];
+  const tot=arr.reduce((a,b)=>a+b,0);
+  const u=(DB.uraian[k]||[]).find(x=>x.id==id);
+  const sisa=u?u.anggaran-tot:0;
+  const urt=document.getElementById('urt-'+id);
+  if(urt)urt.innerHTML=`<strong style="color:${tot>(u?.anggaran||0)?'var(--danger)':'var(--blue)'}">${rp(tot)}</strong>`;
+  // update page totals
+  const totalA=totalAngg(k),totalR=totalRPD(k);
+  const tv=document.getElementById('rpd-tv'),sv=document.getElementById('rpd-sv');
+  if(tv)tv.textContent=rpShort(totalR);
+  if(sv){sv.textContent=rpShort(Math.abs(totalA-totalR));sv.style.color=totalA-totalR<0?'var(--danger)':'var(--success)';}
+}
+
+// ============================================================
+// REKAP PEGAWAI (hanya unit sendiri)
+// ============================================================
+function renderRekap(){
+  const k=CU.key;
+  document.getElementById('rekap-h1').textContent=`Rekap — ${CU.label}`;
+  document.getElementById('rekap-content').innerHTML=buildRekapHTML(k);
+}
+
+function buildRekapHTML(k){
+  const uraianList=DB.uraian[k]||[];
+  const totalA=totalAngg(k),totalR=totalRPD(k);
+  const twl=triwulan(k);
+  const cum=[twl[0],twl[0]+twl[1],twl[0]+twl[1]+twl[2],twl.reduce((a,b)=>a+b,0)];
+  const tgts=[15,50,70,100];
+  const label=USERS[k]?.label||k;
+
+  let html=`<div class="stats-row">
+    <div class="sc blue"><div class="lbl">Pagu</div><div class="val">${rpShort(totalA)}</div></div>
+    <div class="sc"><div class="lbl">Total RPD</div><div class="val">${rpShort(totalR)}</div></div>
+    <div class="sc"><div class="lbl">Sisa</div><div class="val" style="color:${totalA-totalR<0?'var(--danger)':'var(--success)'}">${rpShort(Math.abs(totalA-totalR))}</div></div>
+  </div>
+  <div class="card"><div class="ct">Progres Triwulan — ${label}</div>
+    <div class="twl-grid">${['I','II','III','IV'].map((l,i)=>{
+      const p=totalA>0?(cum[i]/totalA*100).toFixed(1):0;
+      const bc=parseFloat(p)>=tgts[i]?'ok':'pb';
+      return`<div class="twlc">
+        <div class="tl">TW ${l}</div>
+        <div class="tv">${p}%</div>
+        <div class="pw" style="margin:4px auto"><div class="pb ${bc}" style="width:${Math.min(p,100)}%"></div></div>
+        <div class="tt">Target ${tgts[i]}%</div>
+        <div style="font-size:10px;color:var(--gray-400);margin-top:2px">${rp(cum[i])}</div>
+      </div>`;
+    }).join('')}</div>
+  </div>
+  <div class="card" style="padding:0"><div class="ct" style="padding:14px 16px 0">Detail RPD — ${label}</div>
+    <div class="tw"><table>
+      <thead><tr>
+        <th style="min-width:160px">Uraian</th><th class="tr">Pagu</th>
+        ${M3.map(m=>`<th class="tr">${m}</th>`).join('')}
+        <th class="tr">Total RPD</th><th class="tr">Sisa</th>
+      </tr></thead>
+      <tbody>${uraianList.map((u,idx)=>{
+        const rpdArr=DB.rpd[k]?.[u.id]||Array(12).fill(0);
+        const tot=rpdArr.reduce((a,b)=>a+b,0);
+        const sisa=u.anggaran-tot;
+        return`<tr>
+          <td>${u.nama}</td>
+          <td class="tr money">${rp(u.anggaran)}</td>
+          ${rpdArr.map(v=>`<td class="tr" style="color:${v>0?'var(--blue)':'var(--gray-400)'}">${v>0?rp(v):'-'}</td>`).join('')}
+          <td class="tr money"><strong>${rp(tot)}</strong></td>
+          <td class="tr money" style="color:${sisa<0?'var(--danger)':'var(--success)'}">${rp(Math.abs(sisa))}</td>
+        </tr>`;
+      }).join('')}</tbody>
+      <tfoot><tr>
+        <td>JUMLAH</td><td class="tr">${rp(totalA)}</td>
+        ${Array(12).fill(0).map((_,i)=>{
+          const s=uraianList.reduce((a,u)=>a+(DB.rpd[k]?.[u.id]?.[i]||0),0);
+          return`<td class="tr">${s>0?rp(s):'-'}</td>`;
+        }).join('')}
+        <td class="tr">${rp(totalR)}</td>
+        <td class="tr" style="color:${totalA-totalR<0?'#ff6b6b':'#86efac'}">${rp(Math.abs(totalA-totalR))}</td>
+      </tr></tfoot>
+    </table></div>
+  </div>`;
+
+  // Riwayat pengajuan unit ini saja
+  const mySurat=DB.surat.filter(s=>s.unitKey===k).sort((a,b)=>b.ts-a.ts);
+  if(mySurat.length){
+    html+=`<div class="card" style="padding:0"><div class="ct" style="padding:14px 16px 0">Riwayat Pengajuan</div>
+      <div class="tw"><table>
+        <thead><tr><th>Uraian</th><th>No. Surat</th><th>Nama</th><th class="tr">Jumlah</th><th>Tanggal</th></tr></thead>
+        <tbody>${mySurat.map(s=>{
+          const u=(DB.uraian[k]||[]).find(x=>x.id===s.uraianId);
+          return`<tr>
+            <td>${u?.nama||'-'}</td>
+            <td>${s.no||'-'}</td>
+            <td>${s.nama}</td>
+            <td class="tr money">${rp(s.jumlah)}</td>
+            <td>${s.tgl}</td>
+          </tr>`;
+        }).join('')}</tbody>
+      </table></div>
+    </div>`;
+  }
+  return html;
+}
+
+// ============================================================
+// ADMIN — kelola uraian + rekap semua
+// ============================================================
+function renderAdmin(){
+  let html='';
+  // Kelola uraian per subdit
+  unitKeys().forEach(k=>{
+    const label=USERS[k]?.label||k;
+    const total=totalAngg(k);
+    html+=`<div class="card">
+      <div class="ct">${label} <span class="pill">${rp(total)}</span>
+        <button class="btn-surat blue" style="margin-left:auto" onclick="addUraian('${k}')">+ Tambah Uraian</button>
+      </div>
+      <div id="ue-${k}">${buildUraianEditor(k)}</div>
+    </div>`;
+  });
+  // Rekap semua
+  html+=`<div style="margin:24px 0 10px;font-size:16px;font-weight:700;color:var(--blue-dark);border-bottom:2px solid var(--blue-light);padding-bottom:8px">📊 Rekap Semua Subsatker</div>`;
+  unitKeys().forEach(k=>{
+    html+=`<div style="margin-top:18px;font-size:14px;font-weight:700;color:var(--blue-dark);padding:8px 0 4px;border-bottom:1px solid var(--gray-200)">${USERS[k]?.label||k}</div>
+      <div id="ra-${k}"></div>`;
+  });
+  document.getElementById('admin-content').innerHTML=html;
+  unitKeys().forEach(k=>{
+    const el=document.getElementById('ra-'+k);
+    if(el)el.innerHTML=buildRekapHTML(k);
+  });
+}
+
+function buildUraianEditor(k){
+  return(DB.uraian[k]||[]).map(u=>`
+    <div class="ue-row" id="uer-${k}-${u.id}">
+      <input class="ui" value="${u.nama}" onchange="updUraianNama('${k}',${u.id},this.value)">
+      <input class="ud" type="number" value="${u.anggaran}" onchange="updUraianDana('${k}',${u.id},this.value)">
+      <button class="ue-del" onclick="delUraian('${k}',${u.id})">Hapus</button>
+    </div>`).join('');
+}
+function updUraianNama(k,id,v){const u=DB.uraian[k].find(x=>x.id==id);if(u)u.nama=v;saveDB();}
+function updUraianDana(k,id,v){const u=DB.uraian[k].find(x=>x.id==id);if(u)u.anggaran=parseInt(v)||0;saveDB();}
+function addUraian(k){
+  const id=Math.max(0,...(DB.uraian[k]||[]).map(x=>x.id))+1;
+  DB.uraian[k].push({id,nama:'Uraian Baru',anggaran:0});
+  if(!DB.rpd[k])DB.rpd[k]={};
+  DB.rpd[k][id]=Array(12).fill(0);
+  saveDB();
+  document.getElementById('ue-'+k).innerHTML=buildUraianEditor(k);
+}
+function delUraian(k,id){
+  if(!confirm('Hapus uraian ini?'))return;
+  DB.uraian[k]=DB.uraian[k].filter(x=>x.id!=id);
+  if(DB.rpd[k])delete DB.rpd[k][id];
+  saveDB();
+  document.getElementById('ue-'+k).innerHTML=buildUraianEditor(k);
+}
+
+// ============================================================
+// MODAL SURAT
+// ============================================================
+function openSurat(k,uraianId,uraianNama,angg){
+  SC={k,uraianId};
+  const r=totalRPD_uraian(k,uraianId);
+  document.getElementById('ms-info').innerHTML=`<strong>Uraian:</strong> ${uraianNama}<br><strong>Total RPD Diisi:</strong> ${rp(r)} dari ${rp(angg)}`;
+  document.getElementById('ms-tgl').value=new Date().toISOString().split('T')[0];
+  document.getElementById('ms-no').value='';
+  document.getElementById('ms-nama').value='';
+  document.getElementById('ms-jab').value='';
+  document.getElementById('ms-jml').value=r||'';
+  document.getElementById('ms-cat').value='';
+  openModal('mod-surat');
+}
+function totalRPD_uraian(k,id){return(DB.rpd[k]?.[id]||[]).reduce((a,b)=>a+b,0);}
+function submitSurat(){
+  const nama=document.getElementById('ms-nama').value.trim();
+  if(!nama){alert('Nama pengaju harus diisi');return;}
+  DB.surat.push({
+    id:Date.now(),unitKey:SC.k,uraianId:SC.uraianId,type:'pengajuan',
+    tgl:document.getElementById('ms-tgl').value,
+    no:document.getElementById('ms-no').value.trim(),
+    nama,jabatan:document.getElementById('ms-jab').value.trim(),
+    jumlah:parseInt(document.getElementById('ms-jml').value)||0,
+    catatan:document.getElementById('ms-cat').value.trim(),
+    ts:Date.now()
+  });
+  saveDB();
+  closeModal('mod-surat');
+  showNotif('✅','Pengajuan Disimpan','Surat pengajuan RPD berhasil disimpan.');
+  if(document.getElementById('page-rpd').classList.contains('active'))renderRPD();
+}
+
+// ============================================================
+// MODAL UTILS
+// ============================================================
+function openModal(id){document.getElementById(id).classList.add('open');}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+function showNotif(icon,title,msg){
+  document.getElementById('ni-icon').textContent=icon;
+  document.getElementById('ni-title').textContent=title;
+  document.getElementById('ni-msg').textContent=msg;
+  openModal('mod-notif');
+}
+document.querySelectorAll('.mov').forEach(el=>el.addEventListener('click',e=>{if(e.target===el)el.classList.remove('open');}));
+</script>
+</body>
+</html>
