@@ -2,4 +2,5 @@
 - kalau anggaran kurang atau lebih diberikan peringatan
 - pada halaman rekap, ajukan rpd diganti menjadi ajukan anggaran, bukan ajukan rpd
 - admin belum bisa mengisi uraian kegiatan
-- 
+- tampilan navbar di hp jangan dibawah
+- tampilan navbar di desktop masih tergabung dengan tampilan hp
